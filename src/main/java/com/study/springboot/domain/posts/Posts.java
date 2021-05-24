@@ -1,20 +1,18 @@
 package com.study.springboot.domain.posts; //도메인이란 게시글,댓글, 회원, 정산, 결제 등 소프트웨어에 대한 요구사항 혹은 문제영역.
 
-//import javax.persistence.*;
-
-
+import com.study.springboot.domain.BaseTimeEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 //어노테이션 순서 : 주요 어노테이션을 클래스에 가깝게
-@Getter //롬복 어노테이션 (필수 어노테이션은 아님), 클래스 내 모든 필드의 Getter 메소드를 자동생성.
+@Getter //롬복 어노테이션 (필수 어노테이션은 아님,코틀린 등의 새 언어 전환으로 롬복이 더이상 필요 없을 경우 쉽게 삭제), 클래스 내 모든 필드의 Getter 메소드를 자동생성.
 @NoArgsConstructor //롬복 어노테이션, 기본생성자 자동추가. public Posts(){}와 같은 효과.
 @Entity //JPA 어노테이션, 테이블과 링크될 클래스임을 나타냄. 기본값으로 클래스의 카멜케이스  이름을 언더스코밍 네이밍으로 테이블 이름을 매칭함.
-public class Posts { //실제 DB의 테이블과 매칭될 클래스. 보통 Entity 클래스 라고함.
+public class Posts extends BaseTimeEntity { //실제 DB의 테이블과 매칭될 클래스. 보통 Entity 클래스 라고함.
     @Id //JPA 어노테이션. 해당 테이블의 PK 필드를 나타냄.
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //JPA 어노테이션. PK의 생성규칙을 나타냄. 스트링부트 20에서는 Generation Type.IDENTITY 옵션을 추가해야한 auto_increment가 됨.
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //JPA 어노테이션. PK의 생성규칙을 나타냄. 스트링부트 2에서는 GenerationType.IDENTITY 옵션을 추가해야한 auto_increment가 됨.
     //웬만하면 Entity의 PK는 Long타입의 Auto_increment를 추천.(자세한 이유 p91)
     private Long id;
 
@@ -32,9 +30,15 @@ public class Posts { //실제 DB의 테이블과 매칭될 클래스. 보통 Ent
         this.content = content;
         this.author = author;
     }
+
+    public void update(String title,String content){
+        this.title = title;
+        this.content = content;
+    }
 }
-//sette를 무작정 생성하면 해당 클래스의 인스턴스 값들이 언제 어디서 변해야 하는지 코드상으로 명확하게 구분할수가 없어 차후 기능 변경시 목잡해짐.
+//setter를 무작정 생성하면 해당 클래스의 인스턴스 값들이 언제 어디서 변해야 하는지 코드상으로 명확하게 구분할수가 없어 차후 기능 변경시 목잡해짐.
 //그래서 Entity 클래스에서는 절대 Setter 메소드를 만들지 않음. 대신 해당 필드의 값 변경이 필요하면 명확히 그 목적과 의도를 나타낼 수 있는 메소드를 추가해야함.
 //Setter 없이 어떻게 값을 채워 DB에 삽입? 기본적인 구조는 생성자를 통해 최종값을 채운후 DB에 삽입. 값 변경이 필요할 경우 해당 이벤트에 맞는 public 메소드를 호출하여 변경하는 것을 전제로 함.
 //여기서는 생성자 대신 @Builder를 통해 제공되는 빌더 클래스를 사용. 빌더를 사용하면 어느 필드에 어떤 값을 채워야 할지 명확하게 인지할 수 있음.
 //Example.builder().a(a).b(b).build();
+
